@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Caption Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+    <main class="center-column">
+        <!-- Heading -->
+        <header class="header-block">
+            <h1 class="app-title">Image Caption Generator</h1>
+            <p class="app-subtitle">
+                Upload an image and generate a caption using your CNN + LSTM model.
+            </p>
+        </header>
+
+        <!-- Upload section -->
+<section class="section-block">
+    <form method="POST" action="/predict" enctype="multipart/form-data" class="upload-form">
+        <label for="image-input" class="field-label">Select image</label>
+        <input
+            type="file"
+            id="image-input"
+            name="image"
+            class="file-input"
+            accept="image/*"
+            required
+        >
+
+        {% if filename %}
+            <p class="filename-label">
+                Last captioned image: <span class="filename-text">{{ filename }}</span>
+            </p>
+        {% endif %}
+
+        <button type="submit" class="primary-button">
+            Generate caption
+        </button>
+    </form>
+</section>
+
+        <!-- Image preview -->
+        <section class="section-block">
+            <div class="preview-area">
+                <img id="live-preview"
+                     src="{% if image_url %}{{ image_url }}{% endif %}"
+                     alt="Uploaded image preview"
+                     class="preview-image"
+                     style="{% if not image_url %}display:none;{% endif %}">
+
+                <div id="preview-placeholder"
+                     class="preview-placeholder"
+                     style="{% if image_url %}display:none;{% endif %}">
+                    Choose an image above to see it here.
+                </div>
+            </div>
+        </section>
+
+        <!-- Caption -->
+        <section class="section-block">
+            <div class="caption-area">
+                <h2 class="caption-title">Caption</h2>
+                {% if caption %}
+                    <p class="caption-text">{{ caption }}</p>
+                {% else %}
+                    <p class="caption-text caption-empty">
+                        No caption yet. Upload an image and click “Generate caption”.
+                    </p>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Creators footer -->
+        <footer class="footer">
+            <span>
+                Created by
+                <strong>Anupam Sharma</strong>,
+                <strong>Mananshraj Singh Bhatia</strong>,
+                <strong>Bhavesh Mandle</strong>.
+            </span>
+        </footer>
+    </main>
+</div>
+
+<script>
+    // Live image preview
+    const fileInput = document.getElementById('image-input');
+    const previewImg = document.getElementById('live-preview');
+    const placeholder = document.getElementById('preview-placeholder');
+
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) {
+            previewImg.style.display = 'none';
+            placeholder.style.display = 'flex';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+            placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
+</body>
+</html>
